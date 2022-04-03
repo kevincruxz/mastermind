@@ -1,7 +1,3 @@
-# El juego se basa en adivinar codigos, entonces hay que generar uno random para el user vs comp
-# El codigo se guarda en un array, y cada intento en otro y se van comparando en un ennumerable
-# Hacer un algoritmo para combrobar si esta en la misma posicion o si esta en el array y printear dependiendo
-
 def generate_random
     cipher = []
     4.times do 
@@ -15,10 +11,28 @@ def game
     i = 1 #Count for the number of trys
     computer_cipher = generate_random()
     12.times do
+        if i == 12
+            puts "CAREFUL, This is your last chance!"
+        end
         puts "TRY ##{i}"
         user_cipher = ask_cipher()
         coincidences = check_equals(user_cipher, computer_cipher)
-        puts coincidences
+        if coincidences == "equals"
+            puts "Congratulations you guessed it! 🌑🌑🌑🌑"
+            puts "The cipher was: #{computer_cipher}"
+            break
+        elsif coincidences == ""
+            puts "Wut? there was no coincidences, try another one."
+        else
+            str = ""
+            user_cipher.each do |digit|
+                str += " [#{digit}] "
+            end
+            puts str + " #{coincidences}"
+        end
+        if i == 12
+            puts "Oh man, you lost :( The cipher was: #{computer_cipher}"
+        end
         i += 1
     end
 end
@@ -54,7 +68,6 @@ def check_equals(user_cipher, computer_cipher)
     user_cipher_copy = Array.new(user_cipher) # These are used in a prosses later
     comp_cipher_copy = Array.new(comp_cipher) # These are used in a prosses later
     str = ""
-    p computer_cipher
     j = 0
     # Check what numbers are in exact position
     user_cipher.each_with_index do |digit, i|
@@ -69,7 +82,6 @@ def check_equals(user_cipher, computer_cipher)
     # Check what numbers are in the cipher but not in position
     user_cipher_copy.each do |digit|
         if comp_cipher_copy.any?(digit)
-            p user_cipher_copy
             str += "🌕"
             comp_cipher_copy.each_with_index do |digit_, i|
                 if digit == digit_
