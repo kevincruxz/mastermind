@@ -20,6 +20,7 @@ def guesser_game
         if coincidences == "equals"
             puts "Congratulations you guessed it! 🌑🌑🌑🌑"
             puts "The cipher was: #{computer_cipher}"
+            again?()
             break
         elsif coincidences == ""
             puts "Wut? there was no coincidences, try another one."
@@ -32,6 +33,7 @@ def guesser_game
         end
         if i == 12
             puts "Oh man, you lost :( The cipher was: #{computer_cipher}"
+            again?()
         end
         i += 1
     end
@@ -39,7 +41,9 @@ end
 
 def maker_game
     i = 1
-    cipher = make_cipher() # The user makes it's code
+    cipher = ask_cipher() # The user makes it's code
+    cipher = cipher.map {|digit| digit.to_i}
+    p cipher
     initial_num = rand(1..6)
     try = Array.new(4, initial_num)
     12.times do # Vamos a estar cambiando entre el chack para sacar el response y el algoritmo que responda a esa response
@@ -48,6 +52,7 @@ def maker_game
         if response == 'equals'
             puts "#{try} 🌑🌑🌑🌑"
             puts 'You lose :( The computer guessed your code.'
+            again?()
             break
         else
             puts "#{try} #{response}"
@@ -56,6 +61,7 @@ def maker_game
 
         if i == 12
             puts "You Win gg."
+            again?()
             break
         end
         print "Press enter to continue."
@@ -64,23 +70,10 @@ def maker_game
     end
 end
 
-def make_cipher
-    cipher = []
-    i = 1
-    4.times do
-        print "Select the #{i} digit of your code (digits from 1 to 6): "
-        digit = gets.chomp.to_i
-        while digit < 1 || digit > 6
-            print "Wrong input, try again (only digits from 1 to 6): "
-            digit = gets.chomp.to_i
-        end
-        cipher.push(digit)
-        i += 1
-    end
-    print "Ok you made the cipher: #{cipher}, is it ok? (y/n): "
-    is_it_okay = gets.chomp
-    make_cipher() if is_it_okay == "n" || is_it_okay.downcase == "no"
-    cipher
+def again?
+    print "Want to play again? (y/n): "
+    again = gets.chomp
+    mode_selector() if again == "y" || again.downcase == "yes"
 end
 
 def make_try(digits, response)
@@ -98,7 +91,7 @@ def make_try(digits, response)
     if in_position == 0 && in_array == 0
         try = increase_digits(4, digits)
     elsif in_position + in_array == 4
-        try = change_order(digits, in_position, in_array)
+        try = change_order(digits, in_position)
     else
         try = increase_digits((4 - (in_array + in_position)), digits)
     end
@@ -118,10 +111,8 @@ def increase_digits(how_many, digits)
     digits
 end
 
-def change_order(digits, in_position, in_array)
+def change_order(digits, in_position)
     # choose a rand index and from there push, the other digits n times (n = unposicioned digits)
-    holder = ""
-    holder_2 = ""
     if in_position == 0
         holder = digits[0]
         digits[0] = digits[3]
@@ -165,9 +156,9 @@ def ask_cipher
     cipher = 0
     is_okay = false
     while true
-        print "Write your guess (4 digits 1-6): "
+        print "Write a 4 digits number (only digits from 1 to 6): "
         cipher = gets.chomp.to_i
-        if cipher >= 1111 && cipher <= 6666 # need a better check of digits!
+        if cipher >= 1111 && cipher <= 6666
             cipher_array = cipher.to_s.split("")
             cipher_array.each_with_index do |digit, i|
                 if digit.to_i < 1 || digit.to_i > 6
@@ -220,7 +211,14 @@ end
 
 def game_start
     str = "Hello! Welcome to Mastermind\n"
-    str += "This is a game"
+    str += "This is a game of guessing codes of colors or (in this case) numbers.\n\n"
+    str += "You can choose 2 different gamemodes, code guesser or code maker.\n\n"
+    str += "In code gusser mode, you have 12 attemps to guess a random code generated from the computer.\n"
+    str += "Each time you enter a 4 digit code, the computer checks for compatibilities and returns to you some hints:\n"
+    str += "HINTS INSTRUCTION:\n\"🌑\" means a number is in the code AND in the correct position.\n"
+    str += "\"🌕\" means a number is in the code but NOT in the right position.\nIt won't nessesarily return the hints in order.\n"
+    str += "\nNow, in the code maker mode, you have to enter whatever code you want and the computer is going to try to guess it.\n"
+    str += "\nAnd that's it.\n\n"
     puts str
     mode_selector()
 end
